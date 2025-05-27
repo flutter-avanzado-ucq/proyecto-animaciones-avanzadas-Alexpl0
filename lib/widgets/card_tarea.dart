@@ -21,13 +21,13 @@ class TaskCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return AnimatedOpacity(
       duration: const Duration(milliseconds: 400),
-      opacity: isDone ? 0.6 : 1.0,
+      opacity: isDone ? 0.6 : 1.0, // Animación 2: Cambia la opacidad cuando la tarea está completada
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 400),
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: isDone ? Colors.green.shade100 : Colors.white,
+          color: isDone ? Colors.lightBlueAccent.shade100 : Colors.white, // Animación 1: Cambia el color de fondo a azul cuando la tarea está completada
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
@@ -44,10 +44,12 @@ class TaskCard extends StatelessWidget {
               animation: iconRotation,
               builder: (context, child) {
                 return Transform.rotate(
-                  angle: isDone ? iconRotation.value * pi : 0,
+                  angle: isDone ? (1 - iconRotation.value) * pi : pi, 
+                  // Animación 3: Rota el ícono 180 grados (pi radianes) cuando la tarea está completada
+                  // Se arreglo el estado inicial para que terminara en la posición correcta
                   child: Icon(
                     isDone ? Icons.check_circle : Icons.radio_button_unchecked,
-                    color: isDone ? Colors.green : Colors.grey,
+                    color: isDone ? Colors.blue : Colors.grey, // Cambiado a azul para mantener coherencia
                   ),
                 );
               },

@@ -15,6 +15,7 @@ class _TaskScreenState extends State<TaskScreen>
     with SingleTickerProviderStateMixin {
   final List<Map<String, dynamic>> _tasks = [];
   late AnimationController _iconController;
+  bool _isAddIcon = true; // Variable para controlar el estado del icono
 
   @override
   void initState() {
@@ -41,7 +42,7 @@ class _TaskScreenState extends State<TaskScreen>
     setState(() {
       _tasks[index]['done'] = !_tasks[index]['done'];
     });
-    _iconController.forward(from: 0);
+    _iconController.forward(from: 0); // Reinicia la animación del icono cuando se marca/desmarca una tarea
   }
 
   void _removeTask(int index) {
@@ -50,15 +51,38 @@ class _TaskScreenState extends State<TaskScreen>
     });
   }
 
+  void _toggleFabIcon() {
+    // Animación 5: Función para alternar el icono del FAB entre añadir y calendario
+    setState(() {
+      _isAddIcon = !_isAddIcon;
+    });
+    
+    if (_isAddIcon) {
+      _iconController.reverse(); // Anima hacia el icono de añadir
+    } else {
+      _iconController.forward(); // Anima hacia el icono de calendario
+    }
+  }
+
   void _showAddTaskSheet() {
+    _toggleFabIcon(); // Anima el icono al mostrar la hoja de añadir tarea
+    
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (_) => AddTaskSheet(onSubmit: _addTask),
-    );
+      builder: (_) => AddTaskSheet(onSubmit: (task) {
+        _addTask(task);
+        _toggleFabIcon(); // Vuelve al estado original del icono cuando se añade la tarea
+      }),
+    ).whenComplete(() {
+      // Si el usuario cierra la hoja sin añadir tarea, restauramos el icono
+      if (!_isAddIcon) {
+        _toggleFabIcon();
+      }
+    });
   }
 
   @override
@@ -100,13 +124,13 @@ class _TaskScreenState extends State<TaskScreen>
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _showAddTaskSheet,
-        backgroundColor: Colors.deepPurple,
+        backgroundColor: Colors.blueAccent,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(14),
         ),
         child: AnimatedIcon(
-          icon: AnimatedIcons.add_event,
-          progress: _iconController,
+          icon: AnimatedIcons.add_event, // Animación 4: Cambia el icono del botón entre añadir y calendario
+          progress: _iconController, // Controlador que permite la transición fluida entre iconos
         ),
       ),
     );
