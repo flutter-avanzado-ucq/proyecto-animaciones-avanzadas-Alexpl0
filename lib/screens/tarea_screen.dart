@@ -15,7 +15,6 @@ class _TaskScreenState extends State<TaskScreen>
     with SingleTickerProviderStateMixin {
   final List<Map<String, dynamic>> _tasks = [];
   late AnimationController _iconController;
-  bool _isAddIcon = true; // Variable para controlar el estado del icono
 
   @override
   void initState() {
@@ -39,50 +38,33 @@ class _TaskScreenState extends State<TaskScreen>
   }
 
   void _toggleComplete(int index) {
-    setState(() {
-      _tasks[index]['done'] = !_tasks[index]['done'];
-    });
-    _iconController.forward(from: 0); // Reinicia la animación del icono cuando se marca/desmarca una tarea
+    // 28 de Mayo, agregada validación de índices para prevenir errores de rango al marcar tareas
+    if (index >= 0 && index < _tasks.length) {
+      setState(() {
+        _tasks[index]['done'] = !_tasks[index]['done'];
+      });
+      _iconController.forward(from: 0);
+    }
   }
 
   void _removeTask(int index) {
-    setState(() {
-      _tasks.removeAt(index);
-    });
-  }
-
-  void _toggleFabIcon() {
-    // Animación 5: Función para alternar el icono del FAB entre añadir y calendario
-    setState(() {
-      _isAddIcon = !_isAddIcon;
-    });
-    
-    if (_isAddIcon) {
-      _iconController.reverse(); // Anima hacia el icono de añadir
-    } else {
-      _iconController.forward(); // Anima hacia el icono de calendario
+    // 28 de Mayo, agregada validación de índices para prevenir errores al eliminar tareas
+    if (index >= 0 && index < _tasks.length) {
+      setState(() {
+        _tasks.removeAt(index);
+      });
     }
   }
 
   void _showAddTaskSheet() {
-    _toggleFabIcon(); // Anima el icono al mostrar la hoja de añadir tarea
-    
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (_) => AddTaskSheet(onSubmit: (task) {
-        _addTask(task);
-        _toggleFabIcon(); // Vuelve al estado original del icono cuando se añade la tarea
-      }),
-    ).whenComplete(() {
-      // Si el usuario cierra la hoja sin añadir tarea, restauramos el icono
-      if (!_isAddIcon) {
-        _toggleFabIcon();
-      }
-    });
+      builder: (_) => AddTaskSheet(onSubmit: _addTask),
+    );
   }
 
   @override
@@ -93,24 +75,69 @@ class _TaskScreenState extends State<TaskScreen>
           children: [
             const Header(),
             Expanded(
+              // 28 de Mayo, AnimationLimiter previene que las animaciones se repitan durante el scroll
               child: AnimationLimiter(
                 child: ListView.builder(
                   padding: const EdgeInsets.symmetric(vertical: 8),
                   itemCount: _tasks.length,
                   itemBuilder: (context, index) {
                     final task = _tasks[index];
+                    // 28 de Mayo, configuración de animaciones escalonadas para entrada suave de elementos
                     return AnimationConfiguration.staggeredList(
                       position: index,
                       duration: const Duration(milliseconds: 400),
+                      // 28 de Mayo, animación de deslizamiento vertical desde abajo hacia arriba
                       child: SlideAnimation(
                         verticalOffset: 50.0,
+                        // 28 de Mayo, animación de desvanecimiento para entrada gradual de elementos
                         child: FadeInAnimation(
-                          child: TaskCard(
-                            title: task['title'],
-                            isDone: task['done'],
-                            onToggle: () => _toggleComplete(index),
-                            onDelete: () => _removeTask(index),
-                            iconRotation: _iconController,
+                          // 28 de Mayo, widget Dismissible permite deslizar tareas para eliminarlas con gesto
+                          child: Dismissible(
+                            // 28 de Mayo, clave única basada en el título para identificar cada tarea
+                            key: ValueKey(task['title']),
+                            // 28 de Mayo, solo permite deslizar de derecha a izquierda para eliminar
+                            direction: DismissDirection.endToStart,
+                            // 28 de Mayo, función que se ejecuta cuando se completa el gesto de deslizar
+                            onDismissed: (_) {
+                              final removedTask = task;
+                              _removeTask(index);
+                              // 28 de Mayo, SnackBar para confirmar eliminación de tarea con mensaje personalizado
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    '${removedTask['title']} eliminado',
+                                  ),
+                                  duration: const Duration(seconds: 2),
+                                ),
+                              );
+                            },
+                            // 28 de Mayo, fondo rojo con icono de eliminar que aparece al deslizar
+                            background: Container(
+                              alignment: Alignment.centerRight,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 20,
+                              ),
+                              margin: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 8,
+                              ),
+                              decoration: BoxDecoration(
+                                // 28 de Mayo, color rojo para indicar acción destructiva
+                                color: Colors.red.shade400,
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              child: const Icon(
+                                Icons.delete,
+                                color: Colors.white,
+                              ),
+                            ),
+                            child: TaskCard(
+                              title: task['title'],
+                              isDone: task['done'],
+                              onToggle: () => _toggleComplete(index),
+                              onDelete: () => _removeTask(index),
+                              iconRotation: _iconController,
+                            ),
                           ),
                         ),
                       ),
@@ -124,13 +151,15 @@ class _TaskScreenState extends State<TaskScreen>
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _showAddTaskSheet,
-        backgroundColor: Colors.blueAccent,
+        // 28 de Mayo, cambio de color a púrpura profundo para mejor contraste visual
+        backgroundColor: Colors.deepPurple,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(14),
         ),
         child: AnimatedIcon(
-          icon: AnimatedIcons.add_event, // Animación 4: Cambia el icono del botón entre añadir y calendario
-          progress: _iconController, // Controlador que permite la transición fluida entre iconos
+          // 28 de Mayo, cambio de icono a search_ellipsis para transición entre búsqueda y puntos suspensivos
+          icon: AnimatedIcons.search_ellipsis,
+          progress: _iconController,
         ),
       ),
     );
