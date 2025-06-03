@@ -4,6 +4,10 @@ import '../widgets/card_tarea.dart';
 import '../widgets/header.dart';
 import '../widgets/add_task_sheet.dart';
 
+// 02 de Junio; se agregaron imports para provider y task_provider
+import 'package:provider/provider.dart';
+import '../provider_task/task_provider.dart';
+
 class TaskScreen extends StatefulWidget {
   const TaskScreen({super.key});
 
@@ -13,7 +17,8 @@ class TaskScreen extends StatefulWidget {
 
 class _TaskScreenState extends State<TaskScreen>
     with SingleTickerProviderStateMixin {
-  final List<Map<String, dynamic>> _tasks = [];
+  // 02 de Junio; se eliminó la lista local de tareas para usar provider
+  // final List<Map<String, dynamic>> _tasks = [];
   late AnimationController _iconController;
 
   @override
@@ -31,30 +36,29 @@ class _TaskScreenState extends State<TaskScreen>
     super.dispose();
   }
 
-  void _addTask(String task) {
-    setState(() {
-      _tasks.insert(0, {'title': task, 'done': false});
-    });
-  }
+  // 02 de Junio; se eliminaron métodos locales de manejo de tareas
+  // void _addTask(String task) {
+  //   setState(() {
+  //     _tasks.insert(0, {'title': task, 'done': false});
+  //   });
+  // }
 
-  void _toggleComplete(int index) {
-    // 28 de Mayo, agregada validación de índices para prevenir errores de rango al marcar tareas
-    if (index >= 0 && index < _tasks.length) {
-      setState(() {
-        _tasks[index]['done'] = !_tasks[index]['done'];
-      });
-      _iconController.forward(from: 0);
-    }
-  }
+  // void _toggleComplete(int index) {
+  //   if (index >= 0 && index < _tasks.length) {
+  //     setState(() {
+  //       _tasks[index]['done'] = !_tasks[index]['done'];
+  //     });
+  //     _iconController.forward(from: 0);
+  //   }
+  // }
 
-  void _removeTask(int index) {
-    // 28 de Mayo, agregada validación de índices para prevenir errores al eliminar tareas
-    if (index >= 0 && index < _tasks.length) {
-      setState(() {
-        _tasks.removeAt(index);
-      });
-    }
-  }
+  // void _removeTask(int index) {
+  //   if (index >= 0 && index < _tasks.length) {
+  //     setState(() {
+  //       _tasks.removeAt(index);
+  //     });
+  //   }
+  // }
 
   void _showAddTaskSheet() {
     showModalBottomSheet(
@@ -63,55 +67,57 @@ class _TaskScreenState extends State<TaskScreen>
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (_) => AddTaskSheet(onSubmit: _addTask),
+      // 02 de Junio; se cambió el builder para usar AddTaskSheet sin parámetros
+      builder: (_) => const AddTaskSheet(),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    // 02 de Junio; se agregó el uso del provider para acceso a las tareas
+    final taskProvider = context.watch<TaskProvider>();
     return Scaffold(
       body: SafeArea(
         child: Column(
           children: [
             const Header(),
             Expanded(
-              // 28 de Mayo, AnimationLimiter previene que las animaciones se repitan durante el scroll
+              // 02 de Junio; se agregó comentario sobre AnimationLimiter
+              // AnimationLimiter previene que las animaciones se repitan durante el scroll
               child: AnimationLimiter(
                 child: ListView.builder(
                   padding: const EdgeInsets.symmetric(vertical: 8),
-                  itemCount: _tasks.length,
+                  // 02 de Junio; se cambió para usar taskProvider.tasks.length
+                  itemCount: taskProvider.tasks.length,
                   itemBuilder: (context, index) {
-                    final task = _tasks[index];
-                    // 28 de Mayo, configuración de animaciones escalonadas para entrada suave de elementos
+                    // 02 de Junio; se cambió para usar taskProvider.tasks[index]
+                    final task = taskProvider.tasks[index];
+                    // 02 de Junio; se agregó comentario sobre configuración de animaciones escalonadas
+                    // configuración de animaciones escalonadas para entrada suave de elementos
                     return AnimationConfiguration.staggeredList(
                       position: index,
                       duration: const Duration(milliseconds: 400),
-                      // 28 de Mayo, animación de deslizamiento vertical desde abajo hacia arriba
+                      // 02 de Junio; se agregó comentario sobre animación de deslizamiento
+                      // animación de deslizamiento vertical desde abajo hacia arriba
                       child: SlideAnimation(
                         verticalOffset: 50.0,
-                        // 28 de Mayo, animación de desvanecimiento para entrada gradual de elementos
+                        // 02 de Junio; se agregó comentario sobre animación de desvanecimiento
+                        // animación de desvanecimiento para entrada gradual de elementos
                         child: FadeInAnimation(
-                          // 28 de Mayo, widget Dismissible permite deslizar tareas para eliminarlas con gesto
+                          // 02 de Junio; se agregó comentario sobre widget Dismissible
+                          // widget Dismissible permite deslizar tareas para eliminarlas con gesto
                           child: Dismissible(
-                            // 28 de Mayo, clave única basada en el título para identificar cada tarea
-                            key: ValueKey(task['title']),
-                            // 28 de Mayo, solo permite deslizar de derecha a izquierda para eliminar
+                            // 02 de Junio; se cambió para usar task.title en lugar de task['title']
+                            // clave única basada en el título para identificar cada tarea
+                            key: ValueKey(task.title),
+                            // 02 de Junio; se agregó comentario sobre dirección de deslizamiento
+                            // solo permite deslizar de derecha a izquierda para eliminar
                             direction: DismissDirection.endToStart,
-                            // 28 de Mayo, función que se ejecuta cuando se completa el gesto de deslizar
-                            onDismissed: (_) {
-                              final removedTask = task;
-                              _removeTask(index);
-                              // 28 de Mayo, SnackBar para confirmar eliminación de tarea con mensaje personalizado
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    '${removedTask['title']} eliminado',
-                                  ),
-                                  duration: const Duration(seconds: 2),
-                                ),
-                              );
-                            },
-                            // 28 de Mayo, fondo rojo con icono de eliminar que aparece al deslizar
+                            // 02 de Junio; se cambió para usar taskProvider.removeTask(index)
+                            // función que se ejecuta cuando se completa el gesto de deslizar
+                            onDismissed: (_) => taskProvider.removeTask(index),
+                            // 02 de Junio; se agregó comentario sobre el fondo del Dismissible
+                            // fondo rojo con icono de eliminar que aparece al deslizar
                             background: Container(
                               alignment: Alignment.centerRight,
                               padding: const EdgeInsets.symmetric(
@@ -122,7 +128,8 @@ class _TaskScreenState extends State<TaskScreen>
                                 vertical: 8,
                               ),
                               decoration: BoxDecoration(
-                                // 28 de Mayo, color rojo para indicar acción destructiva
+                                // 02 de Junio; se agregó comentario sobre color rojo
+                                // color rojo para indicar acción destructiva
                                 color: Colors.red.shade400,
                                 borderRadius: BorderRadius.circular(16),
                               ),
@@ -132,10 +139,19 @@ class _TaskScreenState extends State<TaskScreen>
                               ),
                             ),
                             child: TaskCard(
-                              title: task['title'],
-                              isDone: task['done'],
-                              onToggle: () => _toggleComplete(index),
-                              onDelete: () => _removeTask(index),
+                              // 02 de Junio; se cambió para usar task.title en lugar de task['title']
+                              title: task.title,
+                              // 02 de Junio; se cambió para usar task.done en lugar de task['done']
+                              isDone: task.done,
+                              // 02 de Junio; se agregó la propiedad date
+                              date: task.date,
+                              // 02 de Junio; se cambió para usar taskProvider.toggleTask(index)
+                              onToggle: () {
+                                taskProvider.toggleTask(index);
+                                _iconController.forward(from: 0.0);
+                              },
+                              // 02 de Junio; se cambió para usar taskProvider.removeTask(index)
+                              onDelete: () => taskProvider.removeTask(index),
                               iconRotation: _iconController,
                             ),
                           ),
@@ -151,14 +167,16 @@ class _TaskScreenState extends State<TaskScreen>
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _showAddTaskSheet,
-        // 28 de Mayo, cambio de color a púrpura profundo para mejor contraste visual
-        backgroundColor: Colors.deepPurple,
+        // 02 de Junio; se cambió el color de púrpura profundo a azul acento
+        // cambio de color a azul acento para mejor contraste visual
+        backgroundColor: Colors.blueAccent,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(14),
         ),
         child: AnimatedIcon(
-          // 28 de Mayo, cambio de icono a search_ellipsis para transición entre búsqueda y puntos suspensivos
-          icon: AnimatedIcons.search_ellipsis,
+          // 02 de Junio; se cambió el icono de search_ellipsis a menu_home  
+          // cambio de icono a menu_home para transición entre menú y casa
+          icon: AnimatedIcons.menu_home,
           progress: _iconController,
         ),
       ),

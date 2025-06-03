@@ -10,7 +10,7 @@ class Header extends StatelessWidget {
       width: double.infinity,
       decoration: const BoxDecoration(
         gradient: LinearGradient(
-          colors: [Color(0xFF0062E6), Color(0xFF33AEFF)], // Degradado en tonalidades de azul
+          colors: [Color(0xFF0062E6), Color(0xFF33AEFF)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -20,10 +20,10 @@ class Header extends StatelessWidget {
         children: [
           const CircleAvatar(
             radius: 24,
-            backgroundColor: Colors.white70, // Background color for the avatar
+            backgroundColor: Colors.white70,
             child: Icon(
-              Icons.person, // Material icon equivalent to person_24
-              color: Color(0xFF0062E6), // Matching your app's color scheme
+              Icons.person,
+              color: Color(0xFF0062E6),
               size: 30,
             ),
           ),
@@ -32,7 +32,7 @@ class Header extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: const [
               Text(
-                'Hola, Alex 👋', // Nombre cambiado a Alex
+                'Hola, Alex 👋',
                 style: TextStyle(color: Colors.white, fontSize: 18),
               ),
               Text(

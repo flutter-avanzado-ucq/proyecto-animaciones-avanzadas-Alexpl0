@@ -2,27 +2,21 @@
 
 Este proyecto implementa una aplicación de gestión de tareas con animaciones avanzadas para mejorar la experiencia del usuario.
 
-## Animaciones Implementadas
+## Cambios Implementados
 
-### 1. Cambio de color con AnimatedContainer
-- Proporciona retroalimentación visual al cambiar el fondo a rojo cuando una tarea se marca como completada o pendiente.
-- Utiliza la clase AnimatedContainer de Flutter para realizar una transición suave de colores.
-- La animación se activa automáticamente cuando el estado de la tarea cambia.
-- El cambio gradual de color ayuda al usuario a percibir inmediatamente el cambio de estado.
+### 1. Implementación del patrón Provider para manejo de estado
+- Creación de la carpeta `lib/providers/` con TaskProvider para centralizar la lógica de tareas.
+- Refactorización completa de HomeScreen para utilizar Consumer y context.watch().
+- Separación de responsabilidades entre la presentación y la lógica de negocio.
+- Integración de Provider en main.dart con ChangeNotifierProvider.
 
-### 2. Cambio de opacidad con AnimatedOpacity
-- Reduce la visibilidad de tareas completadas para mantener el enfoque en las pendientes, creando una clara jerarquía visual.
-- Las tareas completadas disminuyen su opacidad hasta un 60%, manteniendo su visibilidad pero distinguiéndolas claramente.
-- La implementación permite que los elementos se reintegren con opacidad completa si se marcan como pendientes nuevamente.
+### 2. Funcionalidad de selección de fecha
+- Integración de DatePicker nativo de Flutter para seleccionar fechas específicas en las tareas.
+- Actualización del modelo Task para incluir el campo selectedDate de tipo DateTime.
+- Modificación del formulario de creación de tareas para mostrar el selector de fecha.
+- Visualización de la fecha seleccionada en cada tarea dentro de la lista.
 
-### 3. Rotación de ícono con Transform.rotate
-- Anima una rotación de 180 grados al marcar una tarea, transformando el indicador y añadiendo un elemento interactivo satisfactorio.
-- El movimiento se ejecuta mediante un Transform.rotate envolviendo el ícono de la tarea.
-- La animación completa un ciclo en 400 milisegundos, proporcionando un equilibrio perfecto entre respuesta inmediata y percepción del movimiento.
-
-### 4. AnimatedIcon en el FloatingActionButton
-- Transforma dinámicamente el ícono entre añadir y calendario, indicando el cambio de estado en la aplicación.
-- Implementa la clase AnimatedIcon de Material Design para realizar una metamorfosis suave entre los dos estados.
-- La transformación se activa cuando el usuario interactúa con el botón para añadir una tarea nueva.
-- Esta animación comunica visualmente el cambio de contexto de la interfaz, mejorando la comprensión y navegación del usuario.
-
+### 3. Mejoras en la interfaz de usuario
+- Actualización del AddTaskDialog para incluir la selección de fecha con botón dedicado.
+- Mejora en la presentación visual de las tareas mostrando la fecha seleccionada.
+- Refinamiento de la experiencia de usuario en el flujo de creación de tareas.
