@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
-//02 de Junio; se agregó import de provider para manejo de estado
 import 'package:provider/provider.dart';
-//02 de Junio; se agregó import del task_provider
 import '../provider_task/task_provider.dart';
 
 class AddTaskSheet extends StatefulWidget {
-  //02 de Junio; se eliminó el parámetro onSubmit del constructor
   const AddTaskSheet({super.key});
 
   @override
@@ -14,17 +11,14 @@ class AddTaskSheet extends StatefulWidget {
 
 class _AddTaskSheetState extends State<AddTaskSheet> {
   final _controller = TextEditingController();
-  //02 de Junio; se agregó variable para manejar fecha seleccionada
   DateTime? _selectedDate;
 
-  //02 de Junio; se agregó método dispose para liberar recursos
   @override
   void dispose() {
     _controller.dispose();
     super.dispose();
   }
 
-  //02 de Junio; se agregó función para mostrar selector de fecha
   Future<void> _selectDate() async {
     final DateTime? picked = await showDatePicker(
       context: context,
@@ -42,7 +36,6 @@ class _AddTaskSheetState extends State<AddTaskSheet> {
   void _submit() {
     final text = _controller.text.trim();
     if (text.isNotEmpty) {
-      //02 de Junio; se cambió de widget.onSubmit a Provider para agregar tarea
       Provider.of<TaskProvider>(context, listen: false).addTask(
         text,
         date: _selectedDate,
@@ -75,7 +68,6 @@ class _AddTaskSheetState extends State<AddTaskSheet> {
             onSubmitted: (_) => _submit(),
           ),
           const SizedBox(height: 12),
-          //02 de Junio; se agregó botón para seleccionar fecha de vencimiento
           OutlinedButton.icon(
             onPressed: _selectDate,
             icon: const Icon(Icons.calendar_today),
@@ -93,7 +85,6 @@ class _AddTaskSheetState extends State<AddTaskSheet> {
             onPressed: _submit,
             icon: const Icon(Icons.check),
             label: const Text('Agregar tarea'),
-            //02 de Junio; se agregó estilo para hacer el botón de ancho completo
             style: ElevatedButton.styleFrom(
               minimumSize: const Size(double.infinity, 48),
             ),

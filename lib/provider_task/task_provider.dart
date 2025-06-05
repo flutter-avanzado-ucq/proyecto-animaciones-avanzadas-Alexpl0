@@ -5,13 +5,11 @@ class Task {
   bool done;
   DateTime? date; 
 
-//practica se agrega parametro de fecha
   Task({required this.title, this.done = false, this.date}) {
     date ??= DateTime.now(); 
   }
 }
 
-//Es como el set state, cuando se llame desde otro widget se va a actualizar el diseño
 class TaskProvider with ChangeNotifier {
   final List<Task> _tasks = [];
 
@@ -29,6 +27,13 @@ class TaskProvider with ChangeNotifier {
 
   void removeTask(int index) {
     _tasks.removeAt(index);
+    notifyListeners();
+  }
+
+  // 04 de junio - se agregó función para actualizar tareas existentes
+  void updateTask(int index, String newTitle, {DateTime? date}) {
+    _tasks[index].title = newTitle;
+    _tasks[index].date = date ?? DateTime.now();
     notifyListeners();
   }
 }
