@@ -2,21 +2,34 @@
 
 Este proyecto implementa una aplicación de gestión de tareas con animaciones avanzadas para mejorar la experiencia del usuario.
 
-## Cambios Implementados - 04 de junio
 
-### 1. Implementación de funcionalidad de edición de tareas
-- Creación del widget EditTaskSheet para permitir la edición de tareas existentes.
-- Agregación de la propiedad index en TaskCard para identificar cada tarea específica.
-- Implementación de showModalBottomSheet para mostrar el formulario de edición.
-- Integración del botón de editar en la interfaz de cada tarea.
+## Cambios Implementados - 19 de diciembre
 
-### 2. Actualización del TaskProvider
-- Agregación de la función updateTask() para modificar tareas existentes.
-- Implementación de la lógica para actualizar tanto el título como la fecha de las tareas.
-- Mantenimiento de la notificación de cambios con notifyListeners().
+### 1. Sistema de Notificaciones Completo
+- **Nuevo NotificationService**: Servicio completo para manejo de notificaciones locales.
+- **Notificaciones inmediatas**: Al crear y editar tareas.
+- **Notificaciones programadas**: Para fechas de vencimiento de tareas.
+- **Manejo automático de permisos**: Solicitud y verificación de permisos de notificación.
+- **Soporte para timezone**: Programación exacta de notificaciones.
+- **Ícono personalizado**: Integración de `ic_notification` para las notificaciones.
 
-### 3. Mejoras en la interfaz de usuario
-- Modificación del trailing en TaskCard de un solo botón a Row con dos botones (editar y eliminar).
-- Agregación del botón de editar con ícono específico y color diferenciado.
-- Mantenimiento del botón de eliminar existente junto al nuevo botón de editar.
-- Mejora en la experiencia de usuario permitiendo la edición completa de tareas.
+### 2. Tema Personalizado de la Aplicación
+- **AppTheme**: Implementación de tema personalizado con Material 3.
+- **Google Fonts**: Integración de fuente Poppins para toda la aplicación.
+- **Esquema de colores**: Paleta de colores unificada basada en azul.
+- **Estilos consistentes**: Botones, AppBar y scaffold con diseño coherente.
+
+### 3. Integración de Notificaciones en Widgets
+- **AddTaskSheet**: Notificaciones al crear nuevas tareas.
+- **EditTaskSheet**: Notificaciones al actualizar tareas existentes.
+- **Notificaciones contextuales**: Mensajes específicos según la acción realizada.
+
+### 4. Inicialización Mejorada
+- **Main.dart async**: Inicialización asíncrona del servicio de notificaciones.
+- **Permisos al inicio**: Solicitud automática de permisos al arrancar la app.
+- **Configuración centralizada**: Integración del tema personalizado desde el inicio.
+
+### 5. Mejoras en la Experiencia de Usuario
+- **Feedback inmediato**: Notificaciones que confirman acciones del usuario.
+- **Recordatorios programados**: Sistema de alertas para fechas importantes.
+- **Diseño cohesivo**: Interfaz unificada con el nuevo sistema de temas y notificaciones.

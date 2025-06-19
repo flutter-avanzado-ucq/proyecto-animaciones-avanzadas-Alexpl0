@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../provider_task/task_provider.dart';
+import '../services/notification_service.dart'; // # 18 de Junio; se agregó servicio de notificaciones
 
 class EditTaskSheet extends StatefulWidget {
   final int index;
@@ -20,17 +21,35 @@ class _EditTaskSheetState extends State<EditTaskSheet> {
     super.initState();
     final task = Provider.of<TaskProvider>(context, listen: false).tasks[widget.index];
     _controller = TextEditingController(text: task.title);
-    _selectedDate = task.date;
+    _selectedDate = task.dueDate; // # 18 de Junio; se mantuvo dueDate para consistencia
   }
 
-  void _submit() {
+  void _submit() async { // # 18 de Junio; se agregó async para manejar notificaciones
     final newTitle = _controller.text.trim();
     if (newTitle.isNotEmpty) {
       Provider.of<TaskProvider>(context, listen: false).updateTask(
         widget.index,
         newTitle,
-        date: _selectedDate,
+        newDate: _selectedDate, // # 18 de Junio; se mantuvo newDate para consistencia
       );
+
+      // # 18 de Junio; se agregó notificación inmediata al editar tarea
+      await NotificationService.showImmediateNotification(
+        title: 'Tarea actualizada',
+        body: 'Has actualizado la tarea: $newTitle',
+        payload: 'Tarea actualizada: $newTitle',
+      );
+
+      // # 18 de Junio; se agregó notificación programada para fechas establecidas
+      if (_selectedDate != null) {
+        await NotificationService.scheduleNotification(
+          title: 'Recordatorio de tarea actualizada',
+          body: 'No olvides: $newTitle',
+          scheduledDate: _selectedDate!,
+          payload: 'Tarea actualizada: $newTitle para ${_selectedDate!.day}/${_selectedDate!.month}/${_selectedDate!.year}',
+        );
+      }
+
       Navigator.pop(context);
     }
   }

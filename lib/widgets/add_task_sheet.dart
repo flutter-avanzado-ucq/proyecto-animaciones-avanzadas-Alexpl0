@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../provider_task/task_provider.dart';
+import '../services/notification_service.dart'; // # 18 de Junio; se agregó servicio de notificaciones
 
 class AddTaskSheet extends StatefulWidget {
   const AddTaskSheet({super.key});
@@ -19,28 +20,47 @@ class _AddTaskSheetState extends State<AddTaskSheet> {
     super.dispose();
   }
 
-  Future<void> _selectDate() async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: _selectedDate ?? DateTime.now(),
-      firstDate: DateTime.now(),
-      lastDate: DateTime.now().add(const Duration(days: 365)),
-    );
-    if (picked != null && picked != _selectedDate) {
-      setState(() {
-        _selectedDate = picked;
-      });
-    }
-  }
-
-  void _submit() {
+  void _submit() async { // # 18 de Junio; se agregó async para manejar notificaciones
     final text = _controller.text.trim();
     if (text.isNotEmpty) {
       Provider.of<TaskProvider>(context, listen: false).addTask(
         text,
-        date: _selectedDate,
+        dueDate: _selectedDate, // # 18 de Junio; se mantuvo dueDate para consistencia
       );
+
+      // # 18 de Junio; se agregó notificación inmediata al crear tarea
+      await NotificationService.showImmediateNotification(
+        title: 'Nueva tarea',
+        body: 'Has agregado la tarea: $text',
+        payload: 'Tarea: $text',
+      );
+
+      // # 18 de Junio; se agregó notificación programada para fechas establecidas
+      if (_selectedDate != null) {
+        await NotificationService.scheduleNotification(
+          title: 'Recordatorio de tarea',
+          body: 'No olvides: $text',
+          scheduledDate: _selectedDate!,
+          payload: 'Tarea programada: $text para ${_selectedDate!.day}/${_selectedDate!.month}/${_selectedDate!.year}',
+        );
+      }
+
       Navigator.pop(context);
+    }
+  }
+
+  Future<void> _pickDate() async { // # 18 de Junio; se cambió de '_selectDate' a '_pickDate'
+    final now = DateTime.now();
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: now, // # 18 de Junio; se cambió de '_selectedDate ?? DateTime.now()' a 'now'
+      firstDate: now, // # 18 de Junio; se cambió de 'DateTime.now()' a 'now'
+      lastDate: DateTime(now.year + 5), // # 18 de Junio; se cambió de 'DateTime.now().add(const Duration(days: 365))' a 'DateTime(now.year + 5)'
+    );
+    if (picked != null) { // # 18 de Junio; se removió la comparación '&& picked != _selectedDate'
+      setState(() {
+        _selectedDate = picked;
+      });
     }
   }
 
@@ -68,26 +88,24 @@ class _AddTaskSheetState extends State<AddTaskSheet> {
             onSubmitted: (_) => _submit(),
           ),
           const SizedBox(height: 12),
-          OutlinedButton.icon(
-            onPressed: _selectDate,
-            icon: const Icon(Icons.calendar_today),
-            label: Text(
-              _selectedDate == null 
-                ? 'Seleccionar fecha de vencimiento' 
-                : 'Vence: ${_selectedDate!.day}/${_selectedDate!.month}/${_selectedDate!.year}',
-            ),
-            style: OutlinedButton.styleFrom(
-              minimumSize: const Size(double.infinity, 48),
-            ),
+          // # 18 de Junio; se cambió de OutlinedButton.icon complejo a Row con ElevatedButton simple
+          Row(
+            children: [
+              ElevatedButton(
+                onPressed: _pickDate,
+                child: const Text('Seleccionar fecha'),
+              ),
+              const SizedBox(width: 10),
+              if (_selectedDate != null)
+                Text('${_selectedDate!.day}/${_selectedDate!.month}/${_selectedDate!.year}')
+            ],
           ),
           const SizedBox(height: 12),
           ElevatedButton.icon(
             onPressed: _submit,
             icon: const Icon(Icons.check),
             label: const Text('Agregar tarea'),
-            style: ElevatedButton.styleFrom(
-              minimumSize: const Size(double.infinity, 48),
-            ),
+            // # 18 de Junio; se removió el estilo 'minimumSize: const Size(double.infinity, 48)'
           ),
         ],
       ),

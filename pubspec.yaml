@@ -13,8 +13,16 @@ dependencies:
   google_fonts: ^6.1.0
   flutter_staggered_animations: ^1.1.1
   cupertino_icons: ^1.0.8
+  # 18 de Junio; se agregó provider para gestión de estado de las tareas
   provider: ^6.1.5
+  # 18 de Junio; se agregó intl para formateo de fechas en las tareas
   intl: ^0.20.2
+  # 18 de Junio; se agregó timezone para manejo de zonas horarias en notificaciones
+  timezone: 0.10.1
+  # 18 de Junio; se agregó permission_handler para solicitar permisos de notificaciones
+  permission_handler: ^11.3.0
+  # 18 de Junio; se agregó flutter_local_notifications para recordatorios de tareas
+  flutter_local_notifications: ^19.2.1
 
 dev_dependencies:
   flutter_test:
